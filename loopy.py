@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 k = 0.01720209895
 def rderiv(rvars,vvars,mass,ibody,nbodies):
@@ -47,3 +48,23 @@ def rk4step(rvars, vvars, mass, nbodies, dt):
     
     rvars[i] += dr
     vvars[i] += dv
+    
+def output(rvars, vvars, t):
+  for ibody in range(nbodies):
+    if os.path.exists('b%02d.out'%ibody): 
+      f = open('b%02d.out'%ibody,'a')
+    else:
+      f = open('b%02d.out'%ibody,'w')
+    f.write('%#.8f'+7*' %#.8f'+'\n'%(t,rvars[ibody,0],rvars[ibody,1],rvars[ibody,2],vvars[ibody,0],vvars[ibody,1],vvars[ibody,2]))
+    f.close()
+
+def integrate(rvars,vvars,mass,dt,tfin):
+  time = 0
+  output(rvars,vvars,t)
+  
+  while time < tfin:
+    rk4step(rvars,vvars,mass,len(mass),dt*365.25)
+    time += dt
+    output(rvars,vvars,t)
+
+  
