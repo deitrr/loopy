@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import celestmech as cm
+import matplotlib.pyplot as plt
 
 k = 0.01720209895
 def rderiv(rvars,vvars,mass,ibody,nbodies):
@@ -84,6 +85,7 @@ def output(rvars, vvars, nbodies, t):
 def integrate(rvars,vvars,mass,dt,outdt,tfin):
   time = 0
   nbodies = len(mass)
+  
   output(rvars,vvars,nbodies,time)
   nextout = time+outdt
   
@@ -95,20 +97,20 @@ def integrate(rvars,vvars,mass,dt,outdt,tfin):
       nextout = time+outdt
 
 os.system('rm *.out')
-mass = np.array([1.0,3.7,2.07])
-# rvars = np.array([[0.32946639,-0.03194335,-0.02485509],[0.2966885,0.06010892,0.00443412], [-0.68947529,-0.0920094,0.00408158]])
-# vvars = np.array([[0.08906436,0.02777444,0.00653185],[-0.02295717,0.00057109,-0.0021237], [-0.00199171,-0.01443839,0.00064049]])
-# 
-# integrate(rvars,vvars,mass,0.0001,1,10)
-# 
-# test out harrington form in jacobi coords
-# yr = 365.25
-# P = 79.91*yr
-# 
-# ms = 1.
-# m = np.array([3.7,2.07])
-# # aAB = cm.per2semi(ms,m[0],P)
-# 
+# mass = np.array([1.0,3.7,2.07])
+# # rvars = np.array([[0.32946639,-0.03194335,-0.02485509],[0.2966885,0.06010892,0.00443412], [-0.68947529,-0.0920094,0.00408158]])
+# # vvars = np.array([[0.08906436,0.02777444,0.00653185],[-0.02295717,0.00057109,-0.0021237], [-0.00199171,-0.01443839,0.00064049]])
+# # 
+# # integrate(rvars,vvars,mass,0.0001,1,10)
+# # 
+# # test out harrington form in jacobi coords
+# # yr = 365.25
+# # P = 79.91*yr
+# # 
+# # ms = 1.
+# # m = np.array([3.7,2.07])
+# # # aAB = cm.per2semi(ms,m[0],P)
+# # 
 # a = np.array([0.100027283,1.04164747])
 # e = np.array([0.08,0.269])
 # inc = np.array([17.65,2.54])
@@ -116,17 +118,68 @@ mass = np.array([1.0,3.7,2.07])
 # longa = np.array([0,180])
 # meana = np.array([99.9,66.6])
 # 
-# xBa, vBa = cm.osc2x(ms,m[0],a[0],e[0],inc[0],argp[0],longa[0],meana[0])
-# # xB,vB,xA,vA = cm.astro2bary(ms,m[0],xBa,vBa)
-# # xCoM = xBa*m[0]/(ms+m[0])
-# # vCoM = vBa*m[0]/(ms+m[0])
+# xBa, vBa = cm.osc2x(mass[0],mass[1],a[0],e[0],inc[0],argp[0],longa[0],meana[0])
+# xB,vB,xA,vA = cm.astro2bary(mass[0],mass[1],xBa,vBa)
+# xCoM = xBa*mass[1]/(mass[0]+mass[1])
+# vCoM = vBa*mass[1]/(mass[0]+mass[1])
 # 
-# m2 = m[1]*ms/(ms+m[0])
-# xC, vC = cm.osc2x(ms,m2,a[1],e[1],inc[1],argp[1],longa[1],meana[1])
+# m2 = mass[2]*mass[0]/(mass[0]+mass[1])
+# print(mass[0]+m2)
+# xC, vC = cm.osc2x(mass[0],m2,a[1],e[1],inc[1],argp[1],longa[1],meana[1])
 # 
-# rvars = np.hstack([xBa,xC]).T
-# vvars = np.hstack([vBa,vC]).T
-# integrate(rvars,vvars,mass,0.00001,1,10)
+# xa = np.hstack([xBa,xC])
+# va = np.hstack([vBa,vC])
+# 
+# xb, vb, xs, vs = cm.astro2bary(mass[0],mass[1:],xa,va)
+# 
+# rvars = np.hstack([xs,xb]).T
+# vvars = np.hstack([vs,vb]).T
+
+mass = np.array([1.0,3.7,2.07])
+a = np.array([0.100027283,1.04164747])
+e = np.array([0.08,0.269])
+inc = np.array([17.65,2.54])
+argp = np.array([0.0,270])
+longa = np.array([0,180])
+meana = np.array([99.9,66.6])
+
+xBa, vBa = cm.osc2x(mass[0],mass[1],a[0],e[0],inc[0],argp[0],longa[0],meana[0])
+xB,vB,xA,vA = cm.astro2bary(mass[0],mass[1],xBa,vBa)
+xCoM = xBa*mass[1]/(mass[0]+mass[1])
+vCoM = vBa*mass[1]/(mass[0]+mass[1])
+
+# m2 = mass[2]*mass[0]/(mass[0]+mass[1])
+# print(mass[0]+m2)
+xC, vC = cm.osc2x(mass[0]+mass[1],mass[2],a[1],e[1],inc[1],argp[1],longa[1],meana[1])
+
+rCOM = (mass[0]*xA+mass[1]*xB+mass[2]*xC)/np.sum(mass)
+vCOM = (mass[0]*vA+mass[1]*vB+mass[2]*vC)/np.sum(mass)
+
+xb = np.hstack([xA,xB,xC])-rCOM
+vb = np.hstack([vA,vB,vC])-vCOM
+
+rvars = xb.T
+vvars = vb.T
+# import pdb; pdb.set_trace()
+# plt.subplot(2,2,1)
+# plt.plot(xb[0][1],xb[1][1],'b.')
+# plt.plot(xb[0][0],xb[1][0],'k.')
+# plt.plot(xb[0][2],xb[1][2],'m.')
+# plt.plot([0],[0],'k+')
+# 
+# plt.subplot(2,2,2)
+# plt.plot(xb[0][1],xb[2][1],'b.')
+# plt.plot(xb[0][0],xb[2][0],'k.')
+# plt.plot(xb[0][2],xb[2][2],'m.')
+# plt.plot([0],[0],'k+')
+# 
+# plt.subplot(2,2,3)
+# plt.plot(xb[1][1],xb[2][1],'b.')
+# plt.plot(xb[1][0],xb[2][0],'k.')
+# plt.plot(xb[1][2],xb[2][2],'m.')
+# plt.plot([0],[0],'k+')
+# plt.show()
+integrate(rvars,vvars,mass,0.0001,1,500)
 
 # m = np.array([9.54502e-4,2.857878e-4])
 # a = np.array([5.20336301,9.53707032])
@@ -146,8 +199,8 @@ mass = np.array([1.0,3.7,2.07])
 
 
 #fucking 2 body problem 
-mass = np.array([1.0,3.7])
-rvars = np.array([[0.32946639,-0.03194335,-0.02485509],[0.2966885,0.06010892,0.00443412]])
-vvars = np.array([[0.08906436,0.02777444,0.00653185],[-0.02295717,0.00057109,-0.0021237]])
-
-integrate(rvars,vvars,mass,0.0001,1,10)
+# mass = np.array([1.0,3.7])
+# rvars = np.array([[0.32946639,-0.03194335,-0.02485509],[0.2966885,0.06010892,0.00443412]])
+# vvars = np.array([[0.08906436,0.02777444,0.00653185],[-0.02295717,0.00057109,-0.0021237]])
+# 
+# integrate(rvars,vvars,mass,0.0001,1,10)
