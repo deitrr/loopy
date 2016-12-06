@@ -1,0 +1,12 @@
+srcfolder bv15check
+destfolder incr_ecc
+trialname vpl_incr_
+
+file   A.in
+
+file   B.in
+
+file   C.in
+dEcc   [0.3221,0.8,n10]  e
+
+file   vpl.in

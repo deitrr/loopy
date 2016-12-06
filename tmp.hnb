@@ -1,0 +1,34 @@
+# Pandora from Anglada-Escude 2016
+
+AngleUnit:  deg		# base unit choices: deg, rad
+LengthUnit: AU		# base unit choices: m, AU (or ua), pc
+MassUnit:   Msun	# base unit choices: g, Msun
+TimeUnit:   yr 		# base unit choices: s, h, d, yr
+StepSize:   0.0001	# integration time step       (units of TimeUnit)
+M = 1.00000
+N  =  3 		# number of objects (including the dominant mass)
+
+#OblateJ2 = 0		# J2 parameter of dominant mass (default is 0).
+#OblateRadius = 0	# J2 radius    of dominant mass (default is 0).
+PostNewtonian: No	# Include leading-order post-Newtonian corrections?
+#			  (default is false/no)
+
+Tfinal  =  500 		# final integration time (TimeUnit)
+
+Integrator: Bulirsch-Stoer
+OutputFiles: %d.dat	# name of body-specific output files
+OutputOrder: time x1 x2 x3 v1 v2 v3  	# data columns
+OutputInterval: 1		# time interval to write output (TimeUnit)
+OutputCoord: Bodycentric	# output coordinate system
+OutputHeader: False		# Include column id codes and comments?
+OutputDigits: 8			# precision of numbers in output 
+OutputTypes: HWPs		# particle types to produce files for
+PruneCollisions: True
+
+SaveFiles: save_me.sv
+SaveInterval: 1e5
+#SaveLimit: 2
+
+InputOrder: Mass x1 x2 x3 v1 v2 v3
+
+ParticleType: HWP              
